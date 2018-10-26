@@ -1,3 +1,9 @@
+table
+{
+  padding: 10px;
+  margin: 0px auto;
+}
+
 .box
 {
   width: 200px;
@@ -12,4 +18,20 @@
 {
   font-size: 50px;
   color: red;
+  float: left;
+  padding: 10px;
+}
+
+#player_2
+{
+  font-size: 50px;
+  color:blue;
+  float: right;
+  padding: 10px;
+}
+
+#start
+{
+  font-size: 75px;
+  text-align: center;
 }
