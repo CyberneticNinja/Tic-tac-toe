@@ -1,0 +1,15 @@
+.box
+{
+  width: 200px;
+  height: 200px;
+  background-color: black;
+  color: white;
+  font-size: 190px;
+  text-align: center;
+}
+
+#player_1
+{
+  font-size: 50px;
+  color: red;
+}
