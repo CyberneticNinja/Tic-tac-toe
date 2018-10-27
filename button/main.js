@@ -1,3 +1,4 @@
+// https://stackoverflow.com/questions/21700364/javascript-adding-click-event-listener-to-class
 //Active players. True if players turn else false.
 var player1 = true;
 var player2 = false;
@@ -5,6 +6,68 @@ var player2 = false;
 var gameStillPlaying = false;
 //How many turns the game has lasted for. Cannot be more than 9
 var turns = 0;
+var box = document.getElementsByClassName('box');
+function checkDiagonal() {
+    var r1c1 = document.getElementById('r1c1').innerText;
+    var r2c2 = document.getElementById('r2c2').innerText;
+    var r3c3 = document.getElementById('r3c3').innerText;
+    var r1c3 = document.getElementById('r1c3').innerText;
+    var r3c1 = document.getElementById('r3c1').innerText;
+    var winningCombo = [];
+    if (r1c1 == r2c2 && r2c2 == r3c3) {
+        winningCombo = ['r1c1', 'r2c2', 'r3c3'];
+        return winningCombo;
+    }
+    else if (r1c3 == r2c2 && r2c2 == r3c1) {
+        winningCombo = ['r1c3', 'r2c2', 'r3c1'];
+        return winningCombo;
+    }
+    return winningCombo;
+}
+function checkHorizontals() {
+    for (var count = 1; count <= 3; count++) {
+        if (document.getElementById('r' + count + 'c1').innerText == document.getElementById('r' + count + 'c2').innerText &&
+            document.getElementById('r' + count + 'c2').innerText == document.getElementById('r' + count + 'c3').innerText) {
+            console.log(['r' + count + 'c1', 'r' + count + 'c2', 'r' + count + 'c3']);
+            return ['r' + count + 'c1', 'r' + count + 'c2', 'r' + count + 'c3'];
+        }
+    }
+    return [];
+}
+function checkVerticals() {
+    for (var count = 1; count <= 3; count++) {
+        if (document.getElementById('r1' + 'c' + count).innerText == document.getElementById('r2' + 'c' + count).innerText &&
+            document.getElementById('r2' + 'c' + count).innerText == document.getElementById('r3' + 'c' + count).innerText) {
+            console.log(['r1' + 'c' + count, 'r2' + 'c' + count, 'r3' + 'c' + count]);
+            return ['r1' + 'c' + count, 'r2' + 'c' + count, 'r3' + 'c' + count];
+        }
+    }
+    return [];
+}
+function checkForAWinner() {
+    var winningCells = [];
+    if (checkDiagonal().length > 0) {
+        winningCells = checkDiagonal();
+    }
+    else if (checkHorizontals().length > 0) {
+        winningCells = checkHorizontals();
+    }
+    else if (checkVerticals().length > 0) {
+        winningCells = checkVerticals();
+    }
+    console.log(winningCells);
+    if (winningCells.length > 0) {
+        for (var count = 0; count < winningCells.length; count++) {
+            console.log(winningCells[count]);
+            document.getElementById(winningCells[count]).style.color = 'purple';
+        }
+    }
+}
+//Increments turns
+function addTurn() {
+    turns++;
+}
+//Toggles the active player
 function togglePlayer() {
     if (player1 == true) {
         player1 = false;
@@ -23,19 +86,52 @@ function togglePlayer() {
 function init() {
     //Hide start button
     document.getElementById("start").style.display = "none";
-    //Randomly selects player 1 or 2 to go first
     var roll = Math.floor(Math.random() * Math.floor(2));
     // console.log(roll);
     if (roll === 0) {
-        //intial values dont need to be changed
         document.getElementById("player_1").style.textDecoration = 'underline';
     }
     else {
         //toggle active player
         togglePlayer();
     }
+    //reset turns
+    turns = 0;
+    gameStillPlaying = true;
 }
 //Start is clicked
 document.querySelector('#start').addEventListener('click', function () {
     init();
 });
+//Updating displays
+for (var i = 0; i < box.length; i++) {
+    box[i].addEventListener('click', function () {
+        var boxElementId = document.getElementById(this.id).innerText;
+        //Cannot go over 9 turns and there is still a game to be played
+        if (turns < 10 && gameStillPlaying) {
+            //If it element is empty
+            if (boxElementId.trim() == "") {
+                if (turns % 2 == 0) {
+                    document.getElementById(this.id).innerText = 'X';
+                }
+                else {
+                    document.getElementById(this.id).innerText = '0';
+                }
+                if (turns >= 4) {
+                    checkForAWinner();
+                }
+                //increment turn
+                addTurn();
+                //Toggle player
+                togglePlayer();
+            }
+        }
+        else {
+            gameStillPlaying = false;
+        }
+    });
+}
+//There is a max turn limit of 9 for this game
+// function cellClicked() {
+//     console.log('something has been clicked');
+// }
