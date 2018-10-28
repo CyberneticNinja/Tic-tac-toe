@@ -2,33 +2,33 @@
 //Active players. True if players turn else false.
 var player1 = true;
 var player2 = false;
+//Tracks if there is a winner
+var anyoneWon = false;
 //If a player has won, lost or drawn the game then the game is stopped
 var gameStillPlaying = false;
 //How many turns the game has lasted for. Cannot be more than 9
 var turns = 0;
 var box = document.getElementsByClassName('box');
 function checkDiagonal() {
-    var r1c1 = document.getElementById('r1c1').innerText;
-    var r2c2 = document.getElementById('r2c2').innerText;
-    var r3c3 = document.getElementById('r3c3').innerText;
-    var r1c3 = document.getElementById('r1c3').innerText;
-    var r3c1 = document.getElementById('r3c1').innerText;
-    var winningCombo = [];
-    if (r1c1 == r2c2 && r2c2 == r3c3) {
-        winningCombo = ['r1c1', 'r2c2', 'r3c3'];
-        return winningCombo;
+    var row1Column1 = document.getElementById('r1c1').innerText;
+    var row1Column3 = document.getElementById('r1c3').innerText;
+    var row2Column2 = document.getElementById('r2c2').innerText;
+    var row3Column3 = document.getElementById('r3c3').innerText;
+    var row3Column1 = document.getElementById('r3c1').innerText;
+    if (row1Column1 === row2Column2 && row1Column1 === row3Column3 && (row1Column1 == 'X' || row1Column1 == '0')) {
+        return ['r1c1', 'r2c2', 'r3c3'];
     }
-    else if (r1c3 == r2c2 && r2c2 == r3c1) {
-        winningCombo = ['r1c3', 'r2c2', 'r3c1'];
-        return winningCombo;
+    if (row1Column3 === row2Column2 && row1Column3 === row3Column1 && (row1Column3 == 'X' || row1Column3 == '0')) {
+        return ['r1c3', 'r2c2', 'r3c1'];
     }
-    return winningCombo;
+    return [];
 }
 function checkHorizontals() {
     for (var count = 1; count <= 3; count++) {
-        if (document.getElementById('r' + count + 'c1').innerText == document.getElementById('r' + count + 'c2').innerText &&
-            document.getElementById('r' + count + 'c2').innerText == document.getElementById('r' + count + 'c3').innerText) {
-            console.log(['r' + count + 'c1', 'r' + count + 'c2', 'r' + count + 'c3']);
+        var rowXColumn1 = document.getElementById('r' + count + 'c1').innerText;
+        var rowXColumn2 = document.getElementById('r' + count + 'c2').innerText;
+        var rowXColumn3 = document.getElementById('r' + count + 'c3').innerText;
+        if (rowXColumn1 === rowXColumn2 && rowXColumn2 === rowXColumn3 && (rowXColumn1 === 'X' || rowXColumn1 == '0')) {
             return ['r' + count + 'c1', 'r' + count + 'c2', 'r' + count + 'c3'];
         }
     }
@@ -36,9 +36,10 @@ function checkHorizontals() {
 }
 function checkVerticals() {
     for (var count = 1; count <= 3; count++) {
-        if (document.getElementById('r1' + 'c' + count).innerText == document.getElementById('r2' + 'c' + count).innerText &&
-            document.getElementById('r2' + 'c' + count).innerText == document.getElementById('r3' + 'c' + count).innerText) {
-            console.log(['r1' + 'c' + count, 'r2' + 'c' + count, 'r3' + 'c' + count]);
+        var row1ColumnX = document.getElementById('r1' + 'c' + count).innerText;
+        var row2Columnx = document.getElementById('r2' + 'c' + count).innerText;
+        var row3ColumnX = document.getElementById('r3' + 'c' + count).innerText;
+        if (row1ColumnX === row2Columnx && row2Columnx === row3ColumnX && (row1ColumnX === 'X' || row1ColumnX == '0')) {
             return ['r1' + 'c' + count, 'r2' + 'c' + count, 'r3' + 'c' + count];
         }
     }
@@ -55,11 +56,10 @@ function checkForAWinner() {
     else if (checkVerticals().length > 0) {
         winningCells = checkVerticals();
     }
-    console.log(winningCells);
     if (winningCells.length > 0) {
         for (var count = 0; count < winningCells.length; count++) {
-            console.log(winningCells[count]);
             document.getElementById(winningCells[count]).style.color = 'purple';
+            anyoneWon = true;
         }
     }
 }
@@ -87,7 +87,6 @@ function init() {
     //Hide start button
     document.getElementById("start").style.display = "none";
     var roll = Math.floor(Math.random() * Math.floor(2));
-    // console.log(roll);
     if (roll === 0) {
         document.getElementById("player_1").style.textDecoration = 'underline';
     }
@@ -95,6 +94,7 @@ function init() {
         //toggle active player
         togglePlayer();
     }
+    anyoneWon = false;
     //reset turns
     turns = 0;
     gameStillPlaying = true;
@@ -117,13 +117,24 @@ for (var i = 0; i < box.length; i++) {
                 else {
                     document.getElementById(this.id).innerText = '0';
                 }
-                if (turns >= 4) {
+                if (turns >= 3) {
                     checkForAWinner();
                 }
-                //increment turn
-                addTurn();
-                //Toggle player
-                togglePlayer();
+                if (anyoneWon) {
+                    gameStillPlaying = false;
+                    if (player1) {
+                        document.getElementById("player_1").innerText = 'Player One has won';
+                    }
+                    else {
+                        document.getElementById("player_2").innerText = 'Player Two has won';
+                    }
+                }
+                else {
+                    //increment turn
+                    addTurn();
+                    //Toggle player
+                    togglePlayer();
+                }
             }
         }
         else {
@@ -131,7 +142,3 @@ for (var i = 0; i < box.length; i++) {
         }
     });
 }
-//There is a max turn limit of 9 for this game
-// function cellClicked() {
-//     console.log('something has been clicked');
-// }
