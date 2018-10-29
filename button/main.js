@@ -1,7 +1,9 @@
-// https://stackoverflow.com/questions/21700364/javascript-adding-click-event-listener-to-class
 //Active players. True if players turn else false.
 var player1 = true;
 var player2 = false;
+//player Element
+var player1El = document.getElementById("player_1");
+var player2El = document.getElementById("player_2");
 //Tracks if there is a winner
 var anyoneWon = false;
 //If a player has won, lost or drawn the game then the game is stopped
@@ -9,6 +11,14 @@ var gameStillPlaying = false;
 //How many turns the game has lasted for. Cannot be more than 9
 var turns = 0;
 var box = document.getElementsByClassName('box');
+// hide the start button
+function hideStartButton() {
+    document.getElementById("start").style.display = "none";
+}
+//show the start showStartButton
+function showStartButton() {
+    document.getElementById("start").style.display = "inherit";
+}
 function checkDiagonal() {
     var row1Column1 = document.getElementById('r1c1').innerText;
     var row1Column3 = document.getElementById('r1c3').innerText;
@@ -63,6 +73,20 @@ function checkForAWinner() {
         }
     }
 }
+function resetGameValues() {
+    for (var row = 1; row <= 3; row++) {
+        for (var column = 1; column <= 3; column++) {
+            document.getElementById('r' + row + 'c' + column).innerText = "";
+            document.getElementById('r' + row + 'c' + column).style.color = 'white';
+        }
+    }
+}
+function resetPlayerValues() {
+    player1El.innerText = 'Player One';
+    player2El.innerText = 'Player Two';
+    player1El.style.textDecoration = 'none';
+    player2El.style.textDecoration = 'none';
+}
 //Increments turns
 function addTurn() {
     turns++;
@@ -72,23 +96,23 @@ function togglePlayer() {
     if (player1 == true) {
         player1 = false;
         player2 = true;
-        document.getElementById("player_1").style.textDecoration = 'none';
-        document.getElementById("player_2").style.textDecoration = 'underline';
+        player1El.style.textDecoration = 'none';
+        player2El.style.textDecoration = 'underline';
     }
     else {
         player1 = true;
         player2 = false;
-        document.getElementById("player_1").style.textDecoration = 'underline';
-        document.getElementById("player_2").style.textDecoration = 'none';
+        player1El.style.textDecoration = 'underline';
+        player2El.style.textDecoration = 'none';
     }
 }
 //Initalize the game, player is randomly chosen to go first
 function init() {
     //Hide start button
-    document.getElementById("start").style.display = "none";
+    hideStartButton();
     var roll = Math.floor(Math.random() * Math.floor(2));
     if (roll === 0) {
-        document.getElementById("player_1").style.textDecoration = 'underline';
+        player1El.style.textDecoration = 'underline';
     }
     else {
         //toggle active player
@@ -98,6 +122,8 @@ function init() {
     //reset turns
     turns = 0;
     gameStillPlaying = true;
+    resetGameValues();
+    resetPlayerValues();
 }
 //Start is clicked
 document.querySelector('#start').addEventListener('click', function () {
@@ -108,7 +134,7 @@ for (var i = 0; i < box.length; i++) {
     box[i].addEventListener('click', function () {
         var boxElementId = document.getElementById(this.id).innerText;
         //Cannot go over 9 turns and there is still a game to be played
-        if (turns < 10 && gameStillPlaying) {
+        if (turns < 9 && gameStillPlaying) {
             //If it element is empty
             if (boxElementId.trim() == "") {
                 if (turns % 2 == 0) {
@@ -123,22 +149,29 @@ for (var i = 0; i < box.length; i++) {
                 if (anyoneWon) {
                     gameStillPlaying = false;
                     if (player1) {
-                        document.getElementById("player_1").innerText = 'Player One has won';
+                        player1El.innerText = 'Player One has won';
                     }
                     else {
-                        document.getElementById("player_2").innerText = 'Player Two has won';
+                        player2El.innerText = 'Player Two has won';
                     }
+                    //reset game
+                    showStartButton();
                 }
                 else {
-                    //increment turn
-                    addTurn();
-                    //Toggle player
-                    togglePlayer();
+                    if (turns == 8) {
+                        //reset game
+                        showStartButton();
+                        player1El.innerText = 'Player One has tied';
+                        player2El.innerText = 'Player Two has tied';
+                    }
+                    else {
+                        //increment turn
+                        addTurn();
+                        //Toggle player
+                        togglePlayer();
+                    }
                 }
             }
-        }
-        else {
-            gameStillPlaying = false;
         }
     });
 }
